@@ -16,6 +16,14 @@ import re
 import numpy as np
 from collections import Counter
 
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import KFold
+from sklearn import metrics
+
+import nltk
+nltk.download('stopwords')
+nltk.download('wordnet')
+
 stop = set(stopwords.words('english'))
 exclude = set(string.punctuation) 
 lemma = WordNetLemmatizer()
@@ -30,8 +38,8 @@ def clean(doc):
     return y
 
 
-print "There are 10 sentences of following three classes on which K-NN classification and K-means clustering"\
-         " is performed : \n1. Cricket \n2. Artificial Intelligence \n3. Chemistry"
+print ("There are 10 sentences of following three classes on which K-NN classification and K-means clustering"\
+         " is performed : \n1. Cricket \n2. Artificial Intelligence \n3. Chemistry")
 path = "Sentences.txt"
 
 train_clean_sentences = []
@@ -50,6 +58,7 @@ y_train = np.zeros(30)
 y_train[10:20] = 1
 y_train[20:30] = 2
 
+
 # Clustering the document with KNN classifier
 modelknn = KNeighborsClassifier(n_neighbors=5)
 modelknn.fit(X,y_train)
@@ -57,7 +66,6 @@ modelknn.fit(X,y_train)
 # Clustering the training 30 sentences with K-means technique
 modelkmeans = KMeans(n_clusters=3, init='k-means++', max_iter=200, n_init=100)
 modelkmeans.fit(X)
-
 
 test_sentences = ["Chemical compunds are used for preparing bombs based on some reactions",\
                   "Cricket is a boring game where the batsman only enjoys the game",\
@@ -76,18 +84,81 @@ true_test_labels = ['Cricket','AI','Chemistry']
 predicted_labels_knn = modelknn.predict(Test)
 predicted_labels_kmeans = modelkmeans.predict(Test)
 
-print "\nBelow 3 sentences will be predicted against the learned nieghbourhood and learned clusters:\n1. ",\
-        test_sentences[0],"\n2. ",test_sentences[1],"\n3. ",test_sentences[2]
-print "\n-------------------------------PREDICTIONS BY KNN------------------------------------------"
-print "\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_knn[0])],\
+print ("\nBelow 3 sentences will be predicted against the learned nieghbourhood and learned clusters:\n1. ",\
+        test_sentences[0],"\n2. ",test_sentences[1],"\n3. ",test_sentences[2])
+print ("\n-------------------------------PREDICTIONS BY KNN------------------------------------------")
+print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_knn[0])],\
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_knn[1])],\
-        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_knn[2])]
+        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_knn[2])])
 
-print "\n-------------------------------PREDICTIONS BY K-Means--------------------------------------"
-print "\nIndex of Cricket cluster : ",Counter(modelkmeans.labels_[0:10]).most_common(1)[0][0]
-print "Index of Artificial Intelligence cluster : ",Counter(modelkmeans.labels_[10:20]).most_common(1)[0][0] 
-print "Index of Chemistry cluster : ",Counter(modelkmeans.labels_[20:30]).most_common(1)[0][0]
 
-print "\n",test_sentences[0],":",predicted_labels_kmeans[0],\
-        "\n",test_sentences[1],":",predicted_labels_kmeans[1],\
-        "\n",test_sentences[2],":",predicted_labels_kmeans[2]
+X = X.toarray()
+Y = y_train
+
+kf = KFold(n_splits=10)
+acc=[]
+for train_id, test_id in kf.split(X):
+    x_train, x_test = X[train_id], X[test_id]
+    y_train, y_test = Y[train_id], Y[test_id]
+    modelknn.fit(x_train, y_train);
+    y_pred = modelknn.predict(x_test)
+    acc.append(metrics.accuracy_score(y_test, y_pred))
+    
+print("Akurasi dengan knn = ",np.mean(acc),"\n")
+
+
+print ("\n-------------------------------PREDICTIONS BY K-Means--------------------------------------")
+print ("\nIndex of Cricket cluster : ",Counter(modelkmeans.labels_[0:10]).most_common(1)[0][0])
+print ("Index of Artificial Intelligence cluster : ",Counter(modelkmeans.labels_[10:20]).most_common(1)[0][0]) 
+print ("Index of Chemistry cluster : ",Counter(modelkmeans.labels_[20:30]).most_common(1)[0][0])
+
+print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_knn[0])],\
+        "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_knn[1])],\
+        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_knn[2])])
+
+
+#print ("\n",test_sentences[0],":",predicted_labels_kmeans[0],\
+#        "\n",test_sentences[1],":",predicted_labels_kmeans[1],\
+#        "\n",test_sentences[2],":",predicted_labels_kmeans[2])
+
+
+nb = GaussianNB()
+
+nb.fit(X,Y)
+predicted_labels_nb = nb.predict(Test.toarray())
+
+print ("\n-------------------------------PREDICTIONS BY Naive Bayes------------------------------------------")
+print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_nb[0])],\
+        "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_nb[1])],\
+        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_nb[2])])
+
+acc=[]
+for train_id, test_id in kf.split(X):
+    x_train, x_test = X[train_id], X[test_id]
+    y_train, y_test = Y[train_id], Y[test_id]
+    nb.fit(x_train, y_train);
+    y_pred = nb.predict(x_test)
+    acc.append(metrics.accuracy_score(y_test, y_pred))
+    
+print("Akurasi dengan naive bayes = ",np.mean(acc),"\n")
+
+from sklearn.tree import DecisionTreeClassifier
+tree = DecisionTreeClassifier()
+
+tree.fit(X,Y)
+predicted_labels_tree=tree.predict(Test)
+
+print ("\n-------------------------------PREDICTIONS BY Decesion Tree------------------------------------------")
+print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_tree[0])],\
+        "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_tree[1])],\
+        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_tree[2])])
+
+acc=[]
+for train_id, test_id in kf.split(X):
+    x_train, x_test = X[train_id], X[test_id]
+    y_train, y_test = Y[train_id], Y[test_id]
+    tree.fit(x_train, y_train);
+    y_pred = tree.predict(x_test)
+    acc.append(metrics.accuracy_score(y_test, y_pred))
+    
+print("Akurasi dengan decision tree = ",np.mean(acc),"\n")
