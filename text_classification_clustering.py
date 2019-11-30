@@ -86,7 +86,13 @@ print("\n-------------------PREDICTION USING CLASSIFICATION-------------------")
 #Classification
 
 #KNN
+
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+import warnings
+warnings.filterwarnings('ignore')  # "error", "ignore", "always", "default", "module" or "once"
+
 modelknn = KNeighborsClassifier(n_neighbors=5)
 modelknn.fit(X,y_train)
 predicted_labels_knn = modelknn.predict(Test)
@@ -101,15 +107,19 @@ X = X.toarray()
 Y = y_train
 
 kf = KFold(n_splits=10)
-acc=[]
+precision=[]
+recall=[]
 for train_id, test_id in kf.split(X):
     x_train, x_test = X[train_id], X[test_id]
     y_train, y_test = Y[train_id], Y[test_id]
     modelknn.fit(x_train, y_train);
     y_pred = modelknn.predict(x_test)
-    acc.append(metrics.accuracy_score(y_test, y_pred))
+    precision.append(precision_score(y_test, y_pred,average='macro'))
+    recall.append(recall_score(y_test, y_pred,average='macro'))
+    
 
-print("Akurasi dengan knn","dengan k =",5," = ",np.mean(acc),"\n")
+print("Precision dengan knn","dengan k =",5," = ",np.mean(precision))
+print("Recall dengan knn dengan k=",5,"=",np.mean(recall),"\n")
 
 #Naive Bayes
 from sklearn.naive_bayes import GaussianNB
@@ -123,15 +133,18 @@ print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_nb[0]
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_nb[1])],\
         "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_nb[2])],"\n")
 
-acc=[]
+precision=[]
+recall=[]
 for train_id, test_id in kf.split(X):
     x_train, x_test = X[train_id], X[test_id]
     y_train, y_test = Y[train_id], Y[test_id]
     nb.fit(x_train, y_train);
     y_pred = nb.predict(x_test)
-    acc.append(metrics.accuracy_score(y_test, y_pred))
+    precision.append(precision_score(y_test, y_pred,average='macro'))
+    recall.append(recall_score(y_test, y_pred,average='macro'))
     
-print("Akurasi dengan naive bayes = ",np.mean(acc),"\n")
+print("Precision dengan naive bayes = ",np.mean(precision),)
+print("Recall dengan naive bayes=",np.mean(recall),"\n")
 
 #Decision Tree
 from sklearn.tree import DecisionTreeClassifier
@@ -145,15 +158,18 @@ print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_tree[
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_tree[1])],\
         "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_tree[2])])
 
-acc=[]
+precision=[]
+recall=[]
 for train_id, test_id in kf.split(X):
     x_train, x_test = X[train_id], X[test_id]
     y_train, y_test = Y[train_id], Y[test_id]
     tree.fit(x_train, y_train);
     y_pred = tree.predict(x_test)
-    acc.append(metrics.accuracy_score(y_test, y_pred))
+    precision.append(precision_score(y_test, y_pred,average='macro'))
+    recall.append(recall_score(y_test, y_pred,average='macro'))
     
-print("Akurasi dengan decision tree = ",np.mean(acc),"\n")
+print("\nPrecision dengan decision tree = ",np.mean(precision),)
+print("Recall dengan decision tree=",np.mean(recall),"\n")
 
 
 # Clustering the training 30 sentences with K-means technique
@@ -171,14 +187,17 @@ print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_kmean
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_kmeans[1])],\
         "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_kmeans[2])],"\n")
 
-acc = []
+precision=[]
+recall=[]
 dist = []
 for train_id, test_id in kf.split(X):
     x_train, x_test = X[train_id], X[test_id]
     y_train, y_test = Y[train_id], Y[test_id]
     modelkmeans.fit(x_train);
     y_pred = modelkmeans.predict(x_test)
-    acc.append(metrics.accuracy_score(y_test, y_pred))
+    precision.append(precision_score(y_test, y_pred,average='macro'))
+    recall.append(recall_score(y_test, y_pred,average='macro'))
     
-print("Akurasi dengan K-Means = ",np.mean(acc),"\n")
+print("\nPrecision dengan decision tree = ",np.mean(precision),)
+print("Recall dengan decision tree=",np.mean(recall),"\n")
 
