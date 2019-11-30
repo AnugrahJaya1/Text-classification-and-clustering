@@ -178,14 +178,7 @@ modelkmeans = KMeans(n_clusters=3, init='k-means++', max_iter=200, n_init=100)
 modelkmeans.fit(X)
 predicted_labels_kmeans = modelkmeans.predict(Test)
 
-print ("\n-------------------------PREDICTIONS BY K-Means-------------------------")
-print ("\nIndex of Cricket cluster : ",Counter(modelkmeans.labels_[0:10]).most_common(1)[0][0])
-print ("Index of Artificial Intelligence cluster : ",Counter(modelkmeans.labels_[10:20]).most_common(1)[0][0]) 
-print ("Index of Chemistry cluster : ",Counter(modelkmeans.labels_[20:30]).most_common(1)[0][0])
-
-print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_kmeans[0])],\
-        "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_kmeans[1])],\
-        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_kmeans[2])],"\n")
+print('--------------------------- Clustering ---------------------------')
 
 precision=[]
 recall=[]
@@ -198,6 +191,27 @@ for train_id, test_id in kf.split(X):
     precision.append(precision_score(y_test, y_pred,average='macro'))
     recall.append(recall_score(y_test, y_pred,average='macro'))
     
-print("\nPrecision dengan decision tree = ",np.mean(precision),)
-print("Recall dengan decision tree=",np.mean(recall),"\n")
+print("\nPrecision dengan K-means = ",np.mean(precision),)
+print("Recall dengan K-means=",np.mean(recall),"\n")
 
+#Clustering menggunakan agglomerative clustering
+from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch
+
+modelAgglo=AgglomerativeClustering(n_clusters=3,affinity='euclidean',linkage='ward')
+modelAgglo.fit(X)
+#predicted_labels_kmeans=modelAgglo.fit_predict(Test)
+dendrogram = sch.dendrogram(sch.linkage(X, method='ward'))
+
+precision=[]
+recall=[]
+for train_id, test_id in kf.split(X):
+    x_train, x_test = X[train_id], X[test_id]
+    y_train, y_test = Y[train_id], Y[test_id]
+    modelAgglo.fit(x_train);
+    y_pred = modelAgglo.fit_predict(x_test)
+    precision.append(precision_score(y_test, y_pred,average='macro'))
+    recall.append(recall_score(y_test, y_pred,average='macro'))
+    
+print("\nPrecision dengan Agglomerative Clustering = ",np.mean(precision),)
+print("Recall dengan Agglomerative Clustering=",np.mean(recall),"\n")
