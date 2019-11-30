@@ -128,7 +128,7 @@ nb = GaussianNB()
 nb.fit(X,Y)
 predicted_labels_nb = nb.predict(Test.toarray())
 
-print ("\n-------------------------PREDICTIONS BY NAIVE BAYES-------------------------")
+print ("\n------------PREDICTIONS BY NAIVE BAYES---------------")
 print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_nb[0])],\
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_nb[1])],\
         "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_nb[2])],"\n")
@@ -153,7 +153,7 @@ tree = DecisionTreeClassifier()
 tree.fit(X,Y)
 predicted_labels_tree=tree.predict(Test)
 
-print ("\n-------------------------PREDICTIONS BY Decesion Tree-------------------------")
+print ("\n---------------PREDICTIONS BY Decesion Tree-----------------")
 print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_tree[0])],\
         "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_tree[1])],\
         "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_tree[2])])
@@ -178,7 +178,7 @@ modelkmeans = KMeans(n_clusters=3, init='k-means++', max_iter=200, n_init=100)
 modelkmeans.fit(X)
 predicted_labels_kmeans = modelkmeans.predict(Test)
 
-print('--------------------------- Clustering ---------------------------')
+print('---------------- Clustering By K-Means -------------------')
 
 precision=[]
 recall=[]
@@ -193,7 +193,7 @@ for train_id, test_id in kf.split(X):
     
 print("\nPrecision dengan K-means = ",np.mean(precision),)
 print("Recall dengan K-means=",np.mean(recall),"\n")
-
+print('---------- Clustering By Agglomerative Clustering -------------')
 #Clustering menggunakan agglomerative clustering
 from sklearn.cluster import AgglomerativeClustering
 import scipy.cluster.hierarchy as sch
