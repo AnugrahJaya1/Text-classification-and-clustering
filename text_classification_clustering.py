@@ -12,6 +12,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 import string
 import re
 import numpy as np
+import pandas as pd
 from collections import Counter
 
 from sklearn.model_selection import KFold
@@ -177,6 +178,15 @@ from sklearn.cluster import KMeans
 modelkmeans = KMeans(n_clusters=3, init='k-means++', max_iter=200, n_init=100)
 modelkmeans.fit(X)
 predicted_labels_kmeans = modelkmeans.predict(Test)
+
+print ("\n-------------------------PREDICTIONS BY K-Means-------------------------")
+print ("\nIndex of Cricket cluster : ",Counter(modelkmeans.labels_[0:10]).most_common(1)[0][0])
+print ("Index of Artificial Intelligence cluster : ",Counter(modelkmeans.labels_[10:20]).most_common(1)[0][0]) 
+print ("Index of Chemistry cluster : ",Counter(modelkmeans.labels_[20:30]).most_common(1)[0][0])
+
+print ("\n",test_sentences[0],":",true_test_labels[np.int(predicted_labels_kmeans[0])],\
+        "\n",test_sentences[1],":",true_test_labels[np.int(predicted_labels_kmeans[1])],\
+        "\n",test_sentences[2],":",true_test_labels[np.int(predicted_labels_kmeans[2])],"\n")
 
 print('---------------- Clustering By K-Means -------------------')
 
